@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Application V2</title>
+</head>
+<body onload="getNames()">
+    <div class="container">
+        <h1 style="text-align: center">Chat Application</h1>
+        <h6 style="margin-left: 15px;">Active People: <span id="names"></span></h6>
+        <div class="chat chat1">
+            <label for="name">Enter your Name:</label>
+            <input name="name" id="name" type="text"><br>
+            <label for="password">Enter your Password:</label>
+            <input name="password" id="password" type="text"><br>
+            <label for="message">Message is sent as typed</label><br>
+            <textarea onkeyup="updateMessage(document.getElementById('name').value, document.getElementById('password').value, this.value)" name="message" id="sendMessage" cols="30" rows="10"></textarea><br>
+            <input name="errorMessage" id="errorMessage" type="text">
+        </div>
+        <div class="chat chat2">
+            <label for="retrieveName">Enter a Valid Name To Get the Chat:</label>
+            <input name="retrieveName" id="retrieveName" type="text" onkeyup="recieveMessage(document.getElementById('retrieveName').value)">
+            <textarea name="getMessage" id="getMessage" cols="30" rows="10"></textarea>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    function updateMessage(name, password, message) {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
+                document.getElementById('errorMessage').value = this.responseText;
+            }
+        };
+        xmlhttp.open("GET", "message.php?type=write&name=" + name + "&password=" + password + "&message=" + message, true);
+        xmlhttp.send();
+    }
+
+    var interval = null;
+    function recieveMessage(name) {
+        if(name == '') return;
+        var xmlhttp2 = new XMLHttpRequest();
+        xmlhttp2.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
+                document.getElementById('getMessage').value = this.responseText;
+            }
+        };
+
+        clearInterval(interval);
+        interval = setInterval(function () {
+            xmlhttp2.open("GET", "message.php?type=read&name=" + name, true);
+            xmlhttp2.send();
+        }, 500);
+    }
+
+    function getNames() {
+        var xmlhttp3 = new XMLHttpRequest();
+        xmlhttp3.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
+                document.getElementById('names').innerHTML = this.responseText;
+            }
+        };
+        xmlhttp3.open("GET", "message.php?type=name", true);
+        xmlhttp3.send();
+    }
+</script>
+
+<style>
+
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  margin: 8px 0;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  border-radius: 5px;
+  background-color: lightblue;
+  padding: 20px;
+}
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+}
+    
+</style>
